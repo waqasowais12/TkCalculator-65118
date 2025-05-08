@@ -1,10 +1,16 @@
 import tkinter as tk
 from tkinter import messagebox
+import math
 
 # Function to update expression
 def press(symbol):
     current = input_var.get()
-    input_var.set(current + str(symbol))
+    if symbol == 'x²':
+        input_var.set(current + '**2')
+    elif symbol == '√':
+        input_var.set(current + '√')
+    else:
+        input_var.set(current + str(symbol))
 
 # Function to clear input
 def clear():
@@ -15,6 +21,17 @@ def clear():
 def calculate():
     try:
         expression = input_var.get().replace('×', '*').replace('÷', '/')
+        # Replace square root symbol with math.sqrt
+        while '√' in expression:
+            index = expression.index('√')
+            num = ''
+            i = index + 1
+            while i < len(expression) and (expression[i].isdigit() or expression[i] == '.'):
+                num += expression[i]
+                i += 1
+            if num == '':
+                raise ValueError("Invalid square root usage.")
+            expression = expression.replace(f'√{num}', f'math.sqrt({num})', 1)
         result = eval(expression)
         result_var.set(f"= {result}")
     except ZeroDivisionError:
@@ -25,7 +42,7 @@ def calculate():
 # Initialize main window
 root = tk.Tk()
 root.title("Mobile Calculator")
-root.geometry("320x450")
+root.geometry("320x500")
 root.resizable(False, False)
 root.configure(bg="#222831")
 
@@ -44,13 +61,13 @@ result_display = tk.Label(display_frame, textvariable=result_var, anchor="e",
                           bg="#222831", fg="#00ffcc", font=("Helvetica", 18))
 result_display.pack(expand=True, fill="both", padx=10)
 
-# Button layout
+# Button layout (added x² and √)
 buttons = [
-    ['C', '%', '÷', '×'],
-    ['7', '8', '9', '-'],
-    ['4', '5', '6', '+'],
-    ['1', '2', '3', '='],
-    ['0', '.', '', '']
+    ['C', 'x²', '√', '÷'],
+    ['7', '8', '9', '×'],
+    ['4', '5', '6', '-'],
+    ['1', '2', '3', '+'],
+    ['0', '.', '%', '=']
 ]
 
 # Button frame
